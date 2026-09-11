@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untuk Abel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     UBAH DI SINI KALAU MAU GANTI NAMA / CERITA
+     (cari juga bagian CONFIG di <script> paling bawah)
+     ============================================ */
+  :root{
+    --bg-top:#FBE9E7;
+    --bg-bottom:#FCF1EC;
+    --rose:#C97E8B;
+    --ink:#2E1A22;
+    --card:#FFFDFB;
+    --border:#F0D9DA;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 55%, #FCF1EC 100%);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:0 0 60px;
+    position:relative;
+    overflow-x:hidden;
+  }
+  .page{
+    width:100%;
+    max-width:640px;
+    padding:70px 24px 0;
+    text-align:center;
+    position:relative;
+    z-index:1;
+  }
+  h1{
+    font-family:'Playfair Display', serif;
+    font-weight:600;
+    font-size:clamp(2.6rem, 9vw, 3.6rem);
+    margin:0 0 18px;
+    color:var(--ink);
+    letter-spacing:-0.01em;
+  }
+  .subtitle{
+    font-family:'Playfair Display', serif;
+    font-style:normal;
+    font-weight:400;
+    font-size:clamp(1.6rem, 6vw, 2.2rem);
+    line-height:1.28;
+    color:var(--rose);
+    margin:0 auto 34px;
+    max-width:20ch;
+  }
+  .divider{
+    width:54px;
+    height:1px;
+    background:#d9b3b8;
+    margin:0 auto 46px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:44px 30px 40px;
+    box-shadow:0 20px 45px -20px rgba(120,50,60,.18);
+    position:relative;
+  }
+  .story{
+    font-family:'Playfair Display', serif;
+    font-size:1.28rem;
+    line-height:1.6;
+    color:var(--ink);
+    margin:0 0 10px;
+  }
+  .story p{ margin:0 0 14px; }
+  .story p:last-child{ margin-bottom:0; }
+  .buttons{
+    margin-top:32px;
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    position:relative;
+    min-height:56px;
+  }
+  #yesBtn{
+    padding:16px 34px;
+    border:none;
+    border-radius:12px;
+    background:var(--rose);
+    color:#fff;
+    font-family:'Plus Jakarta Sans', sans-serif;
+    font-weight:600;
+    font-size:1.05rem;
+    cursor:pointer;
+    transition:transform .18s ease, background .18s ease;
+  }
+  #yesBtn:hover{ background:#B76976; transform:translateY(-1px); }
+  #yesBtn.grow{
+    transform:scale(1.15);
+  }
+  #noBtn{
+    padding:16px 26px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:transparent;
+    color:#9c7a80;
+    font-family:'Plus Jakarta Sans', sans-serif;
+    font-weight:500;
+    font-size:.95rem;
+    cursor:pointer;
+    transition:transform .18s ease, opacity .18s ease;
+    white-space:nowrap;
+  }
+  .result{
+    margin-top:22px;
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:1.15rem;
+    color:var(--rose);
+    min-height:1.4em;
+    opacity:0;
+    transition:opacity .3s ease;
+  }
+  .result.show{ opacity:1; }
+  .heart{
+    position:fixed;
+    top:-40px;
+    font-size:1.4rem;
+    pointer-events:none;
+    z-index:5;
+    animation:fall linear forwards;
+  }
+  @keyframes fall{
+    to{ transform:translateY(105vh) rotate(30deg); opacity:.2; }
+  }
+  footer{
+    margin-top:50px;
+    font-size:.78rem;
+    color:#b89298;
+  }
+  @media (prefers-reduced-motion: reduce){
+    #noBtn{ transition:none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1 id="receiverTitle">Abel</h1>
+  <p class="subtitle" id="senderSubtitle">dari Fahri, dengan sedikit keberanian.</p>
+  <div class="divider"></div>
+
+  <div class="card">
+    <div class="story" id="storyText">
+      <p>Setelah semua itu, Fahri cuma mau tanya satu hal ke Abel.</p>
+      <p><strong id="question">Mau nggak jadi pacar Fahri?</strong></p>
+    </div>
+
+    <div class="buttons">
+      <button id="yesBtn">Iya, mau</button>
+      <button id="noBtn">nggak</button>
+    </div>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <footer>dibuat khusus buat Abel.</footer>
+</div>
+
+<script>
+/* ============================================
+   CONFIG — ganti bagian ini buat personalisasi
+   ============================================ */
+const CONFIG = {
+  receiverName: "Abel",
+  senderName: "Fahri",
+  storyParagraphs: [
+    "Setelah semua itu, {sender} cuma mau tanya satu hal ke {receiver}."
+  ],
+  question: "Mau nggak jadi pacar {sender}?",
+  yesReply: "{receiver} bilang iya. {sender} nggak bisa berhenti senyum sekarang. 💗",
+  noDodgeText: "{sender} nggak nyerah kok",
+  noBounceCount: 4 // berapa kali tombol "nggak" kabur sebelum diem
+};
+/* ============================================ */
+
+function fill(str){
+  return str.replaceAll("{sender}", CONFIG.senderName).replaceAll("{receiver}", CONFIG.receiverName);
+}
+
+document.getElementById('receiverTitle').textContent = CONFIG.receiverName;
+document.getElementById('senderSubtitle').textContent = `dari ${CONFIG.senderName}, dengan sedikit keberanian.`;
+document.getElementById('question').textContent = fill(CONFIG.question);
+
+const storyEl = document.getElementById('storyText');
+storyEl.innerHTML = CONFIG.storyParagraphs.map(p => `<p>${fill(p)}</p>`).join('') +
+  `<p><strong>${fill(CONFIG.question)}</strong></p>`;
+
+const yesBtn = document.getElementById('yesBtn');
+const noBtn = document.getElementById('noBtn');
+const buttonsWrap = document.querySelector('.buttons');
+const result = document.getElementById('result');
+
+let dodgeCount = 0;
+noBtn.textContent = "nggak";
+
+function dodge(){
+  if(dodgeCount >= CONFIG.noBounceCount){
+    noBtn.textContent = fill(CONFIG.noDodgeText);
+    return;
+  }
+  dodgeCount++;
+  const wrapRect = buttonsWrap.getBoundingClientRect();
+  const btnRect = noBtn.getBoundingClientRect();
+  const maxX = wrapRect.width - btnRect.width - 8;
+  const maxY = 80;
+  const x = Math.random() * maxX - maxX/2;
+  const y = Math.random() * maxY - maxY/2;
+  noBtn.style.position = 'relative';
+  noBtn.style.transform = `translate(${x}px, ${y}px)`;
+  noBtn.textContent = fill(CONFIG.noDodgeText);
+  yesBtn.classList.add('grow');
+}
+
+noBtn.addEventListener('mouseenter', dodge);
+noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); dodge(); });
+noBtn.addEventListener('click', (e) => { e.preventDefault(); dodge(); });
+
+function spawnHearts(){
+  const emojis = ['💗','💕','✨','💖'];
+  for(let i=0;i<24;i++){
+    setTimeout(() => {
+      const h = document.createElement('div');
+      h.className = 'heart';
+      h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      h.style.left = Math.random()*100 + 'vw';
+      h.style.fontSize = (1 + Math.random()*1.2) + 'rem';
+      h.style.animationDuration = (2.4 + Math.random()*1.6) + 's';
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 4200);
+    }, i*70);
+  }
+}
+
+yesBtn.addEventListener('click', () => {
+  result.textContent = fill(CONFIG.yesReply);
+  result.classList.add('show');
+  noBtn.style.opacity = '0';
+  noBtn.style.pointerEvents = 'none';
+  spawnHearts();
+});
+</script>
+</body>
+</html>
